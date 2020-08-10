@@ -1,0 +1,573 @@
+---
+title: "Organisation of Patient meta-data for COVID-19 project in Anna Smed Sörensens lab"
+author: "Maximilian Julius Lautenbach"
+date: '`r format(Sys.Date(), "%Y-%m-%d")`'
+output: html_document
+abstract: Short project description.
+knit: (function(inputFile, encoding) {
+          rmarkdown::render(inputFile,
+                            encoding = encoding, 
+                            output_file = paste0(
+                              xfun::sans_ext(inputFile), '_', Sys.Date(), '.html'),
+                                output_dir = "../results/lab_book/")})
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(echo = TRUE,
+                     root.dir = "/Users/maxlau/COVID19/",
+                     fig.width = 6, fig.height = 5,
+                     warning = FALSE, 
+                     message = FALSE)
+server.path <- "/Volumes/tank/groups/broliden/Färnert group/Individual folders/Julius Lautenbach/)"
+result.dir <- paste0("results/",Sys.Date(),"/")
+
+## creates result.dir with date in if not existent
+ifelse(isFALSE(dir.exists(paste0("../",result.dir))), dir.create(paste0("../",result.dir),recursive = TRUE),"Result directory for today exists already!")
+options(stringsAsFactors = FALSE) 
+```
+
+## Needed libraries
+```{r libraries, message=FALSE}
+library(tidyverse)
+#library(tidyr) # data reformatting
+#library(dplyr) # data reformatting
+#library(stringr) # string manipulation
+library(readxl) # reading excel files
+#library(haven) # needed to read stata files
+library(lubridate) # date handling
+#library(viridis)
+```
+
+## Needed libraries
+```{r message=FALSE, warning=FALSE}
+file = "data/NPA DC_clinical data_MASTER_200622.xlsx"
+## Check if file excists
+file.exists(file)
+##new sofa scores 20.07.2020 från ryan
+SOFA_new <- read.csv2("data/pat_data_julius_20200720.csv") %>% dplyr::select(pid,severity_shrt)
+
+data.raw <- read_excel(file, sheet = "Timepoints", col_types = c("numeric", 
+                                                                 "date", "date", "date", "date", "date", 
+                                                                  "date", "date", "date", "date", "date", 
+                                                                  "date", "date", "date", "date", "date", 
+                                                                  "date", "date", "numeric", "text", 
+                                                                  "text", "text", "numeric")) 
+data <- data.raw %>% filter(ID >= 156) %>% 
+  rename(Score = `Highest disease severity 1=DO NOT SEEK HEALTHCARE 2=NOT ADMITTED 3=<5 L OXY 4=>5L OXY/HFNC, 5=NIV, 6=INTUB, 7=DEAD`) %>% 
+  mutate(Score = gsub("\\?","",Score),Score) %>% ## removing ? from scores - ? because patient status can still change
+  mutate(Score2 = ifelse(Score == "1", "DO NOT SEEK HEALTHCARE",
+                         ifelse(Score == "2","NOT ADMITTED",
+                                ifelse(Score == "3","<5 L OXY",
+                                       ifelse(Score == "4","=>5L OXY/HFNC",
+                                              ifelse(Score =="5","NIV",
+                                                     ifelse(Score =="6","INTUB",
+                                                            ifelse(Score =="7","DEAD","missing")))))))) %>% 
+  mutate(Score2 = factor(as.factor(Score2), levels = c("DO NOT SEEK HEALTHCARE",
+                                                       "NOT ADMITTED",
+                                                       "<5 L OXY", 
+                                                       "=>5L OXY/HFNC",
+                                                       "NIV",
+                                                       "INTUB",
+                                                       "DEAD",
+                                                       "missing"))) 
+## Data structure
+glimpse(data)
+```
+**New severity scores**
+
+1. Do not seek healthcare, not admitted
+2. Seek healthcare, not admitted
+3. Admitted, oxygen up to 5L
+4. Admitted, oxygen >5L or HFNC
+5. Admitted, NIV
+6. Admitted, intubated/mechanical ventilation
+7. Dead (can be excluded if we separate by outcome later, but for now easiest to have it)
+
+## Time line, detailed
+
+### Preparing data for figure
+* calculating time after onset, timepoint, timeperiods
+* seperate ICU timeperiod calculation for separate layer on plot
+
+
+```{r}
+## function to fill NA-rows with value from above to next not-NA-row
+unfill_vec = function(x, direction = c("down", "up")) {
+  if (direction[1] == "down") {
+    x[which(x[-1] == x[1:(length(x) - 1)]) + 1] = NA
+  } else {
+    x = rev(unfill(rev(x), direction = "down"))
+  }
+  x
+}
+```
+
+```{r warning=FALSE}
+  
+data.loop <- data %>% 
+  select(-`Duration of stay (days)`,-h,-`RESOLUTION DATE`,-Score,-Score2) %>% 
+  gather(timepoint,date,contains("date")) %>% 
+  select(-...23,-`Disease severiy Resp SOFA`)
+
+loop.data.woICU <- list()
+loop.data.ICU <- list()
+
+for(i in unique(data.loop$ID)){
+ # i="223"#"165"
+df_woICU <- data.loop %>% ## get all dates patient was present in study documentation
+  filter(ID == i) %>% 
+  arrange(date) %>% 
+  na.omit() %>% 
+  mutate(date = as.Date(date)) %>%
+  complete(date = seq.Date(min(date), max(date), by="day")) %>% 
+  select(date) %>% 
+  ## join to individual dates
+  full_join(data.loop %>% 
+              filter(ID == i) %>% mutate(date = as.Date(date)),
+            by="date", keep=F) %>% 
+     arrange(date) %>% 
+     mutate(day_total = date - lag(date[1], default = date[1])) %>% 
+     mutate(day_total = day_total/ddays(1)) %>% 
+     mutate(timepoint = gsub(" date","",timepoint)) %>% 
+     mutate(timeperiod = timepoint) %>% 
+  rename(date = date) %>% 
+  select(date,day_total) %>%
+  full_join(data.loop %>% 
+              filter(ID == i) %>% 
+              filter(!grepl("ICU",timepoint)) %>% 
+              mutate(date = as.Date(date)),by="date") %>% 
+              arrange(date) %>% fill(ID,timepoint) %>% 
+  mutate(timeperiod = gsub(" date","",timepoint)) 
+
+df_ICU <- data.loop %>% ## get all dates patient was present in study documentation
+  filter(ID == i) %>% 
+  arrange(date) %>% 
+  na.omit() %>% 
+  mutate(date = as.Date(date)) %>%
+  complete(date = seq.Date(min(date), max(date), by="day")) %>% 
+  select(date) %>% 
+  ## join to individual dates
+  full_join(data.loop %>% 
+              filter(ID == i) %>% mutate(date = as.Date(date)),
+            by="date", keep=F) %>% 
+     arrange(date) %>% 
+     mutate(day_total = date - lag(date[1], default = date[1])) %>% 
+     mutate(day_total = day_total/ddays(1)) %>% 
+     mutate(timepoint = gsub(" date","",timepoint)) %>% 
+     mutate(timeperiod = timepoint) %>% 
+  rename(date = date) %>% 
+  select(date,day_total) %>%
+  full_join(data.loop %>% 
+              filter(ID == i) %>% 
+              filter(grepl("ICU",timepoint)) %>% 
+              mutate(date = as.Date(date)),by="date") %>% 
+              arrange(date) %>% 
+  mutate(ID = i) %>% 
+  fill(timepoint) %>% 
+  mutate(timeperiod = gsub(" date","",timepoint)) 
+
+df_woICU <- df_woICU %>% 
+  na.omit() %>% 
+  arrange(date) %>% 
+  mutate(timepoint = unfill_vec(timepoint)) %>% 
+     mutate(timeperiod = factor(timeperiod, levels = unique(timeperiod))) %>% 
+  select(-timepoint,-ID) %>% 
+  full_join(data.loop %>% 
+              filter(ID == i) %>% 
+              mutate(date = as.Date(date)), by="date", keep=F) %>% 
+  fill(ID) %>% 
+  mutate(timepoint_day = ifelse(!is.na(timepoint),day_total,"NA")) %>% 
+  mutate(timepoint_day = as.numeric(timepoint_day))
+
+df_ICU <- df_ICU %>%
+  mutate(timeperiod = ifelse(is.na(timeperiod),"no ICU",timeperiod)) %>% 
+  mutate(timepoint = ifelse(is.na(timepoint),"no ICU",timepoint)) %>% 
+
+  na.omit() %>% 
+  arrange(date) %>% 
+  mutate(timepoint = unfill_vec(timepoint)) %>% 
+     mutate(timeperiod = factor(timeperiod, levels = unique(timeperiod))) %>% 
+  select(-timepoint,-ID) %>% 
+  full_join(data.loop %>% 
+              filter(ID == i) %>% 
+              mutate(date = as.Date(date)), by="date", keep=F) %>% 
+  fill(ID) %>% 
+  select(-timepoint) %>% 
+  mutate(timeperiod = gsub("ICU discharge",NA,timeperiod)) %>% 
+  mutate(day_total = ifelse(is.na(timeperiod),NA,day_total)) 
+
+  loop.data.woICU[[i]] <- df_woICU
+  loop.data.ICU[[i]] <- df_ICU
+}
+
+plot.input.woICU <-  do.call(rbind, loop.data.woICU) 
+plot.input.ICU <-  do.call(rbind, loop.data.ICU) 
+```
+
+## Detailed overview figure
+```{r warning=FALSE}
+timepoint_size <- c("Onset of symptoms" = 2,
+                    "Admission" = 2,
+                    "ICU" = 2,
+                    "ICU discharge"= 2,
+                    "T1 (inclusion)" = 2,
+                    "T2" = 2,
+                    "T3" = 2,
+                    "T4" = 2,
+                    "T5" = 2,
+                    "T6" = 2,
+                    "T7" = 2,
+                    "T8" = 2, 
+                    "T9" = 2,
+                    "T10"=2,
+                    "Discharged date" = 3,
+                    "Death date" = 3)
+
+timepoint_colors <- c("Onset of symptoms date"="grey",
+                    "Admission date"="black",
+                    "ICU date"="orange",
+                    "ICU discharge date"= "orange",
+                    "T1 date (inclusion date)"='#deebf7',
+                    "T2 date"='#c6dbef',
+                    "T3 date"='#9ecae1',
+                    "T4 date"='#6baed6',
+                    "T5 date"='#4292c6',
+                    "T6 date"='#2171b5',
+                    "T7 date"='#08519c',
+                    "T8 date"='#08306b',
+                    "T9 date"='#03224f',
+                    "T10 date"="#041a3b",
+
+                    "Discharged date"="green",
+                    "Death date" = "red")
+
+period_colors <- c("Onset of symptoms"="lightyellow",
+                    "Admission"="grey",
+                    "ICU"="orange",  
+                    "T1 (inclusion)"='#deebf7',
+                    "T2"='#c6dbef',
+                    "T3"='#9ecae1',
+                    "T4"='#6baed6',
+                    "T5"='#4292c6',
+                    "T6"='#2171b5',
+                    "T7"='#08519c',
+                    "T8"='#08306b',
+                   "T9"='#03224f',
+                   "T10"="#041a3b",
+                    "Discharged"="lightgreen",
+                    "Death" = "red")
+
+## Small changes/exlcusions/ before plotting/sorting
+
+plot.input <- bind_rows(plot.input.woICU,plot.input.ICU)  %>% 
+  mutate(ID = as.character(ID)) %>% 
+  mutate(symbol = ifelse(grepl("T",timeperiod),"2",
+                         ifelse(grepl("Discharged",timeperiod),"5",
+                                ifelse(grepl("Death",timeperiod),"4","1")))) %>% 
+  mutate(symbol = as.numeric(symbol)) %>% 
+  mutate(timeperiod = gsub("Onset of symptomes","Symptomes before admission",timeperiod)) %>% 
+  mutate(ssize = ifelse(grepl("Death date",timepoint),0.45,0.3)) %>% 
+  mutate(ssize = ifelse(grepl("Discharged date",timepoint),0.45,ssize)) %>% 
+  mutate(ssize = as.numeric(ssize)) %>% 
+  mutate(timeperiod = gsub("no ICU",NA,timeperiod)) %>% 
+  mutate(timepoint = factor(as.factor(timepoint), levels = c("Onset of symptoms date",
+                                                             "Admission date",
+                                                             "Discharged date",
+                                                             "Death date",
+                                                             "ICU date",
+                                                             "ICU discharge date",
+                                                             "T1 date (inclusion date)",
+                                                             "T2 date",
+                                                             "T3 date",
+                                                             "T4 date",
+                                                             "T5 date",
+                                                             "T6 date",
+                                                             "T7 date",
+                                                             "T8 date",
+                                                             "T9 date",
+                                                             "T10 date",
+                                                             NA))) %>% 
+  mutate(timeperiod = factor(as.factor(timeperiod), levels = c("Onset of symptoms",
+                                                               "Admission",
+                                                               "Discharged",
+                                                               "Death",
+                                                               "ICU",
+                                                               "T1 (inclusion)",
+                                                               "T2",
+                                                               "T3",
+                                                               "T4",
+                                                               "T5",
+                                                               "T6",
+                                                               "T7",
+                                                               "T8",
+                                                               "T9",
+                                                               "T10",
+                                                               NA))) %>% 
+  full_join(data %>% select(ID,Score2) %>% mutate(ID = as.character(ID)),by="ID") %>% 
+  mutate(timepoint_day2 = ifelse(grepl("Discharged date",timepoint),timepoint_day+0.5,
+                                ifelse(grepl("Death date",timepoint),timepoint_day+0.5,timepoint_day))) %>% 
+  filter(!is.na(Score2))
+ 
+## Plotting the time line
+(plot <- ggplot() +
+    coord_flip() +
+    ### NO ICU period
+    geom_tile(data = plot.input %>% filter(timeperiod != "ICU"), 
+              mapping = aes(x = ID, y = day_total+0.5, fill = timeperiod), alpha = 0.6) +
+    scale_fill_manual(values = period_colors) +
+    ### ICU period
+    geom_tile(data = plot.input %>% filter(timeperiod == "ICU"), 
+                mapping = aes(x = ID, y = day_total+0.5, fill = timeperiod),alpha = 0.9, colour = "grey") +
+    #scale_fill_manual(values = period_colors) +  
+    
+    ### time points
+    geom_point(data = plot.input %>% filter(timeperiod != "ICU"),
+               mapping = aes(x=ID,y= timepoint_day2, col=timepoint)) +
+    scale_color_manual(values = timepoint_colors) +
+    
+    scale_y_continuous(name="days", breaks=seq(0,70,2)) +
+    scale_size(guide="none") +
+    labs(fill = "Periode (days)",
+         color = "Timepoint") +
+    labs(title = "Timeline for COVID19 patients in study cohort") +
+    theme_classic() +
+    theme(strip.text.y = element_text(angle = 0)) +
+    theme(#axis.title.y=#element_blank(),
+      axis.text.y =element_text(size=rel(0.8)),
+      axis.ticks.y=element_blank()))
+
+## creating plot with Score separation
+#plot + facet_grid(rows = vars(Score2), scales="free_y", labeller = labeller(Score2 = label_wrap_gen(15)))
+
+## Saving plot as pdf
+#ggsave(paste0(result.dir,"Timeline_COVID19_KI_Cohort.pdf"), plot, width=11, height=12, units="in")
+```
+
+# More simplified Timeline
+
+```{r message=FALSE, warning=FALSE}
+
+timepoint_colors <- c("Onset of symptoms date"="grey",
+                    "Admission date"="#c17d3d",
+                    #"ICU date"="orange",
+                    #"ICU discharge date"= "orange",
+                    "Sample"='#648ace',
+                    "Discharged date"="#4baa5a",
+                    "Death date" = "#cd5048")
+
+period_colors <- c("Onset of symptoms"="lightyellow",
+                    "Admission"="#c17d3d",
+                    "ICU"="#e174a1",  
+                    "Study period"='#49adad',
+                    
+                    "Discharged"="#4baa5a",
+                    "Death" = "#cd5048")
+
+## Small changes/exlcusions/ before plotting/sorting
+plot.input <- bind_rows(plot.input.woICU,plot.input.ICU)  %>% 
+  mutate(ID = as.character(ID)) %>% 
+  mutate(symbol = ifelse(grepl("Death",timeperiod),"3",
+                         ifelse(grepl("Discharged",timeperiod),"2","1"))) %>% 
+  mutate(timeperiod = gsub("Onset of symptomes","Symptomes before admission",timeperiod)) %>% 
+  mutate(ssize = ifelse(grepl("Death date",timepoint),0.40,0.3)) %>% 
+  mutate(ssize = ifelse(grepl("Discharged date",timepoint),0.40,ssize)) %>% 
+  mutate(ssize = as.numeric(ssize)) %>% 
+  mutate(timeperiod = gsub("no ICU",NA,timeperiod)) %>% 
+  
+  mutate(timepoint = ifelse(grepl("T.",timepoint),"Sample",timepoint)) %>% 
+  mutate(timeperiod = ifelse(grepl("T.",timeperiod),"Study period",timeperiod)) %>% 
+  mutate(timeperiod = ifelse(grepl("Death",timeperiod),"Study period",timeperiod)) %>% 
+  mutate(timeperiod = ifelse(grepl("Discharged",timeperiod),"Study period",timeperiod)) %>% 
+  mutate(timepoint = ifelse(grepl("ICU.",timepoint),"NA",timepoint)) %>% 
+  mutate(timepoint = ifelse(grepl("Admission",timepoint),"NA",timepoint)) %>% 
+  mutate(timepoint = factor(as.factor(timepoint), levels = c("Onset of symptoms date",
+                                                             "Admission date",
+                                                             "Discharged date",
+                                                             "Death date",
+                                                             "Sample"))) %>% 
+  full_join(data %>% select(ID,Score2) %>% mutate(ID = as.character(ID)),by="ID") %>% 
+  mutate(timepoint_day2 = ifelse(grepl("Discharged date",timepoint),timepoint_day+0.15,
+                                ifelse(grepl("Death date",timepoint),timepoint_day+0.15,timepoint_day))) %>% 
+  filter(!is.na(Score2)) %>% 
+  mutate(size_n = ifelse(timepoint %in% c("Discharged date","Death date"),4,3.5))
+
+(plot <- ggplot() +
+    coord_flip() +
+    ### NO ICU period
+    geom_tile(data = plot.input %>% filter(timeperiod != "ICU"), 
+                mapping = aes(x = ID, y = day_total-0.0, fill = timeperiod), alpha = 0.6) +
+    scale_fill_manual(values = period_colors) +
+    ### ICU period
+    geom_tile(data = plot.input %>% filter(timeperiod == "ICU"), 
+                mapping = aes(x = ID, y = day_total-0.0, fill = timeperiod), alpha = 0.9) +
+    ## time points  
+    geom_point(data = plot.input %>% filter(timeperiod != "ICU"),
+               aes(x = ID,y = timepoint_day2, shape = timepoint), col="black", size = 2, fill = "green") +
+    scale_shape_manual(values=c(8,24, 3, 16)) +
+    scale_size_manual(values=c(5,7,5,5)) +
+    scale_y_continuous(name="days", breaks=seq(0,70,2)) +
+    labs(fill = "Periode (days)",
+         shape = "Timepoint") +
+    labs(title = "Timeline for COVID19 patients in study cohort",
+         y = "Days after Symptom onset",
+         x = "Patients") +
+    theme_classic() +
+    facet_grid(rows = vars(Score2),
+               scales="free_y",
+               shrink = F,
+               #scales = "fixed",
+               space = "free",
+               labeller = labeller(Score2 = label_wrap_gen(15)))+ 
+    theme(strip.text.y = element_text(angle = 0)) +
+    theme(axis.title.y=element_text(size=rel(0.8)),#element_blank(),
+          axis.text.y =element_blank(),#element_text(size=rel(0.8)),#element_blank(),
+          axis.ticks.y=element_blank()))
+
+## Saving plot as pdf
+ggsave(paste0(result.dir,"Timeline_COVID19_KI_Cohort_Simple.pdf"), plot, width=11, height=12, units="in")
+
+```
+## list of patients to include and their SOFA score
+```{r}
+pat_to_include_SOFA <- read_delim("data/covid_patient_characteristics.txt", col_names = T, delim = ";")
+pat_to_include <- pat_to_include_SOFA %>% 
+  select(pid) %>% mutate(pid = as.character(pid)) %>%  unname() %>% unlist()
+```
+
+
+# Time line with SOFA Score
+```{r message=FALSE, warning=FALSE}
+## list of COVID19 negative patients
+neg_patients <- data %>% filter(grepl("NEG",h)) %>% select(ID) %>% mutate(ID = as.character(ID)) %>%  unname() %>% unlist()
+
+## Creating sub categories for SOFA score
+#SOFA_data <- data %>% select(ID,`Disease severiy Resp SOFA`) %>%
+#  mutate(SOFA_group = ifelse(`Disease severiy Resp SOFA` %in% c(1,2),"Mild",
+#                             ifelse(`Disease severiy Resp SOFA` %in% c(3,4),"Moderate",
+#                                    ifelse(`Disease severiy Resp SOFA` %in% c(5,6),"Severe",
+#                                           ifelse(`Disease severiy Resp SOFA` == 7, "Fatal",NA))))) %>% 
+#  mutate(ID = as.character(ID)) %>% 
+#  mutate(SOFA_group = factor(as.factor(SOFA_group), levels = c("Mild",
+#                                                               "Moderate",
+#                                                               "Severe", 
+#                                                               "Fatal")))
+
+SOFA_data <- SOFA_new %>% 
+  mutate(ID = as.character(pid)) %>% 
+  mutate(SOFA_group = factor(as.factor(severity_shrt), levels = c("Mild",
+                                                               "Moderate",
+                                                               "Severe", 
+                                                               "Fatal")))
+  
+## Color scheme
+timepoint_colors <- c("Onset of symptoms date" = "grey",
+                    "Admission date" = "#c17d3d",
+                    "Sample" = '#648ace',
+                    "Discharged date" = "#4baa5a",
+                    "Death date" = "#cd5048")
+
+period_colors <- c("COVID-19 Symptoms" = "#FFFF00",
+                    #"Admission" = "#c17d3d",
+                    "ICU" = "red",  
+                    #"Study period" = '#49adad',
+                    "Hospitalized" ='orange')
+                    #"Discharged"="#4baa5a",
+                    #"Death" = "#cd5048"
+                   
+
+
+plot.pre.input <- bind_rows(plot.input.woICU %>% distinct() %>% filter(!is.na(date)),
+                            plot.input.ICU %>% distinct() %>% filter(!is.na(date)))  %>% 
+  mutate(ID = as.character(ID)) %>% 
+  mutate(timeperiod = gsub("Onset of symptomes","Symptomes before admission",timeperiod)) %>% 
+  mutate(timeperiod = gsub("no ICU",NA,timeperiod)) %>% 
+  mutate(timeperiod = ifelse(grepl("T.",timeperiod),"Study period",timeperiod)) %>% 
+  mutate(timeperiod = ifelse(grepl("Death",timeperiod),"Study period",timeperiod)) %>% 
+  mutate(timeperiod = ifelse(grepl("Discharged",timeperiod),"Study period",timeperiod)) %>% 
+  mutate(timeperiod_simple = ifelse(timeperiod %in% c("Admission","Study period"),"Ward",timeperiod)) %>% 
+  mutate(timepoint_simple = timepoint) %>% 
+  mutate(timepoint_simple = gsub("Admission",NA,timepoint_simple)) %>% 
+  mutate(timepoint_simple = gsub("ICU.",NA,timepoint_simple)) %>% 
+  mutate(timepoint_simple = ifelse(grepl("T.",timepoint_simple),"Sample",timepoint_simple)) %>% 
+  mutate(timepoint_simple = factor(as.factor(timepoint_simple), levels = c("Onset of symptoms date",
+                                                                           "Admission date",
+                                                                           "Discharged date",
+                                                                           "Death date",
+                                                                           "Sample"))) %>% 
+  mutate(timepoint_day_end = ifelse(grepl("Discharged date",timepoint),timepoint_day,
+                                ifelse(grepl("Death date",timepoint),timepoint_day,NA)))
+
+plot.input <- right_join(plot.pre.input, SOFA_data, by = "ID") %>%
+  #filter(!ID %in% neg_patients) %>% 
+  filter(ID %in% pat_to_include) %>% 
+
+  filter(!ID %in% c("257","258")) %>% ## hospitalised for trauma
+  mutate(timeperiod_simple = gsub("Onset of symptoms", "COVID-19 Symptoms",timeperiod_simple)) %>% 
+  mutate(timeperiod_simple = gsub("Ward", "Hospitalized",timeperiod_simple)) %>% 
+
+  mutate(timeperiod_simple = factor(as.factor(timeperiod_simple), levels = c("COVID-19 Symptoms",
+                                                                             "Hospitalized",
+                                                                             "ICU"))) %>% 
+  
+  mutate(timepoint_simple = gsub("date","",timepoint_simple)) %>% 
+  mutate(timepoint_simple = gsub("Onset of symptoms",NA,timepoint_simple)) %>% 
+  distinct() 
+
+## counting how many patients in each group
+quant_sofa_groups <- plot.input %>% 
+  group_by(SOFA_group) %>% 
+  distinct(ID) %>%
+  count(SOFA_group) %>% 
+  mutate(new = paste0(SOFA_group, "\n n=", n)) %>% 
+  select(-n) %>% 
+  as.tibble() %>%
+  deframe()
+
+## plotting overview plot
+(plot <- ggplot() +
+    coord_flip() +
+    ### NO ICU period
+    geom_tile(data = plot.input %>% filter(timeperiod != "ICU"), 
+              mapping = aes(x = ID, y = day_total-0.0, fill = timeperiod_simple), alpha = 0.6) +
+    scale_fill_manual(values = period_colors) +
+    ### ICU period
+    geom_tile(data = plot.input %>% filter(timeperiod == "ICU"), 
+              mapping = aes(x = ID, y = day_total-0.0, fill = timeperiod_simple), alpha = 0.9) +
+    ### time points  
+    geom_point(data = plot.input %>% filter(timeperiod != "ICU") %>% filter(!timepoint %in% c("Death date","Discharged date")),
+               aes(x = ID,y = timepoint_day, shape = timepoint_simple), color = "black", size = 2) +
+    geom_point(data = plot.input %>% filter(timeperiod != "ICU") %>% filter(timepoint == "Death date"),
+                aes(x = ID,y = timepoint_day_end + 1, shape = timepoint_simple), fill = NA, stroke = 1.4, size = 1,color = "black") +
+    geom_point(data = plot.input %>% filter(timeperiod != "ICU") %>% filter(timepoint == "Discharged date"),
+               aes(x = ID,y = timepoint_day_end + 1, shape = timepoint_simple), fill = "green", size = 2,color = "black") +
+    scale_shape_manual(values = c(3, 23, 1)) + 
+    scale_y_continuous(name = "days", breaks = seq(0, 84, 2)) +
+    labs(fill = "Periode",
+         shape = "Timepoint") +
+    labs(title = "Timeline for COVID19 patients in study cohort",
+         y = "Days after Symptom onset",
+         x = "Patients") +
+    theme_classic() +
+    facet_grid(SOFA_group~.,
+               scales = "free_y",
+               shrink = F,
+               space = "free",
+               labeller = labeller(SOFA_group = quant_sofa_groups)) + 
+    theme(strip.text.y = element_text(angle = 0)) +
+    theme(axis.title.y = element_text(size = rel(0.8)),#element_blank(),
+          axis.text.y = element_blank(),#element_text(size=rel(0.8)),#element_blank(),
+          axis.ticks.y = element_blank()))
+
+## Saving plot as pdf
+ggsave(paste0(result.dir,"Timeline_COVID19_KI_Cohort_Simple_SOFAsep.pdf"), plot, width = 11, height = 12, units = "in")
+
+```
+
+
+
+## SessionInfo
+```{r}
+sessionInfo()
+```
+
+
