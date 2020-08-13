@@ -11,3 +11,6 @@ environment/
 
 *.html
 !README.txt
+
+## ignore renv/library
+/renv/library
