@@ -1,0 +1,13 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+## excluding data, results folder
+/data/*
+/results/*
+bin/
+environment/
+
+*.html
+!README.txt
