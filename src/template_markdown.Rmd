@@ -14,11 +14,11 @@ knit: (function(inputFile, encoding) {
 
 ```{r setup, include=FALSE}
 knitr::opts_knit$set(echo = TRUE,
-                     root.dir = getwd(),#"/Users/maxlau/COVID19/",
+                     root.dir = getwd(),
                      fig.width = 6, fig.height = 5,
                      warning = FALSE, 
                      message = FALSE)
-#server.path <- "/Volumes/tank/groups/broliden/Färnert group/Individual folders/Julius Lautenbach/)"
+
 result.dir <- paste0("results/",Sys.Date(),"/")
 
 ## creates result.dir with date in if not existent
@@ -28,23 +28,18 @@ options(stringsAsFactors = FALSE)
 
 ## Needed libraries
 ```{r libraries, message=FALSE}
-library(tidyverse)
-library(readxl) # reading excel files
-library(lubridate) # date handling
+
 ```
 
 ## Load data
 ```{r message=FALSE, warning=FALSE}
 ```
 
-## save ggplots as pdfs in result/date directory
+
+## Take environment snapshot 
 ```{r}
-
-## Saving plot as pdf
-ggsave(paste0(result.dir,"filename.pdf"), plot, width = 11, height = 12, units = "in")
-
+renv::snapshot()
 ```
-
 
 
 ## SessionInfo
