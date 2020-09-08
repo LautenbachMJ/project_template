@@ -6,6 +6,7 @@
 ## excluding data, results folder
 /data/*
 /results/*
+/manuscript/*
 bin/
 environment/
 
