@@ -1,5 +1,5 @@
-# Project title
-### subtitle 
+# Project template to start a new computational project
+### developed for R but can be adapted freely
 
 ## Table of contents
 * [General info](#general-info)
