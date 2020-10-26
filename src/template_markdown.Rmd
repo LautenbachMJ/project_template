@@ -2,7 +2,12 @@
 title: "please insert your project title"
 author: "please insert your name"
 date: '`r format(Sys.Date(), "%Y-%m-%d")`'
-output: html_document
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: united
+    highlight: pygments
 abstract: Short project description.
 knit: (function(inputFile, encoding) {
           rmarkdown::render(inputFile,
