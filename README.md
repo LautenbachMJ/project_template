@@ -1,5 +1,5 @@
 # Project template to start a new computational project
-    ### Our suggestion for more reproducibility
+### Our suggestion for more reproducibility
 
 ## General info
 This repository contains our idea project directory structure to make computational research projects within our group easier to work with and more reproducible. This project structure is currently our best suggestion but we are happy for suggestions and discussions (see [Thoughts and Comments](#thoughs_comments)).
@@ -20,6 +20,7 @@ This repository provides a template for new computational projects. It contains 
   * Description how to connect a template-based repository with rstudio
   * Several features to help analysis reproducibility
 
+<a name="getting-started"></a>
 ## :technologist: Getting started
 
 ### Creating a repository from a project template
@@ -47,7 +48,7 @@ This repository provides a template for new computational projects. It contains 
 Changes in your environment, e.g. by installing new packages, have to be capture by executing `renv::snapshot()` inside your R markdown.
 
 ### 2. Automatic report generation for your lab book
-When knitting your markdown, e.g. by clicking “knitr” button, the resulting html file will be saved under ```results/labbook/``` with the markdown-file-name and the date when you knitted it.
+When knitting your markdown, e.g. by clicking **knitr** button, the resulting html file will be saved under ```results/labbook/``` with the markdown-file-name and the date when you knitted it.
 These reports can be append to your actual lab book or easily used to show and discuss results with your colleagues.
 To create really nice markdown reports, please see inside the template and check the [R Markdown cheat sheet](https://github.com/rstudio/cheatsheets/raw/master/rmarkdown-2.0.pdf)
 
