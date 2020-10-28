@@ -1,5 +1,5 @@
 # Project template to start a new computational project
-### Our suggestion for more reproducibility
+### Our (@vildeka & @LautenbachMJ) suggestion for project organisation and better reproducibility
 
 ## General info
 This repository contains our idea project directory structure to make computational research projects within our group easier to work with and more reproducible. This project structure is currently our best suggestion but we are happy for suggestions and discussions.
