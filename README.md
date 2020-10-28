@@ -16,8 +16,8 @@ This study includes
 ## Getting started :technologist:
 
 ### Creating a repository from a project template
-1.	Create a new GitHub repository based in this template [Caption](https://github.com/LautenbachMJ/project_template)
-  1.1 Enter a name for your new project repository (choose a clear/smart name and avoid special characters, e.g. covid19_study
+1.	Create a new GitHub repository based in [this template](https://github.com/LautenbachMJ/project_template)
+1a Enter a name for your new project repository (choose a clear/smart name and avoid special characters, e.g. covid19_study
   1.2 Set it to private if you want (otherwise everyone can see your code)
 2. Go to your new GitHub repository and copy the url (green button “Code”)
   2.1 You should have copied something like https://github.com/yourGitHubName/yourRepoName.git
