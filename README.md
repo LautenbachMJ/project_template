@@ -16,19 +16,19 @@ This repository contains our idea project directory structure to make computatio
 ## Repo description
 This repository provides a template for new computational projects. It contains a pre-defined structure, as well as some features for reproducible research using an R project and version control via GitHub.
   * Pre-defined directory structure with readme files
-  * Description how to connect a template-based repository with rstudio
+  * Description on how to connect a template-based repository with rstudio
   * Several features to help analysis reproducibility
 
 <a name="getting-started"></a>
 ## :technologist: Getting started
 
 ### Creating a repository from a project template
-1.	Create a new GitHub repository based in [this template](https://github.com/LautenbachMJ/project_template). You may want to set your repository to private if (otherwise everyone can see your code). You can make the repository available to colleagues by adding them as collaborators to the project.
+1.	Create a new GitHub repository based on [this template](https://github.com/LautenbachMJ/project_template). You may want to set your repository to private if (otherwise everyone can see your code). You can make the repository available to colleagues by adding them as collaborators to the project.
 
 2. Go to your new repository and copy the url (green button “Code”). You should have copied something like `https://github.com/yourGitHubName/yourRepoName.git`.
  
 ### Connecting your GitHub Repository to your RStudio project
-3.	Open RStudio and create a new project (```File/New Project..```) from VersionControl (your GitHub repository) by pasting in the copied URL. This will connect your GitHub repository to your R project and allows version control.
+3.	You can do this either in RStudio or in the terminal. When using RStudio, click on (```File/New Project..```) in the menu bar. Then select "from VersionControl" and "Git". Paste the copied URL and give the respository a name. This will connect your GitHub repository to your R project and allows version control.
 
 
 **Note: From now on, everything described below will be executed in RStudio**
@@ -36,8 +36,8 @@ This repository provides a template for new computational projects. It contains 
 <a name="init_renv"></a>
 ## Initiating your R environment (Reproducibility feature)
 `src/project_init.R` Run the script to initiate the R environment and connect it to the R Project. Consent with **yes** when asked.
-  * Now, all of your used r packages and dependencies will now be recorded by executing ```renv::snapshot()```.
-
+  * From now, all of your used r packages and dependencies will now be recorded in the ```renv.loc``` file when you execute ```renv::snapshot()```.
+  * It is recomended to always use ```ren::hydrate()``` when installing new packages to your project enviroment. It will retrive the packages if allready installed on your computer, or install it from the CRAN r repository if missing. The packages that don't exists on CRAN have to be installed as usuall with ```install.packages()```
 ## Create R markdowns from template (Reproducibility feature)
 `src/template_markdown.Rmd` Creating markdowns from this template will give you several reproducibility friendly feature:
   * Automatic connection to your environment (renv)
