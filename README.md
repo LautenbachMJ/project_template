@@ -5,9 +5,9 @@
 * [General info](#general-info)
 * [Repo description](#repo-description)
 * [Getting started](#getting-started)
-* [Initiating your R environment (Reproducibility feature)](#init_renv)
-* [Create R markdowns from template (Reproducibility feature)](#markdown)
-* [Thoughts and Comments](#thoughs_comments)
+* [Initiating your R environment (Reproducibility feature)](#Initiating-your-R-environment-(Reproducibility-feature))
+* [Create R markdowns from template (Reproducibility feature)](#Create R markdowns from template (Reproducibility feature))
+* [Thoughts and Comments](#Thoughts and Comments)
 
 ## General info
 This study includes
@@ -42,19 +42,19 @@ File-> new project -> Version Control, Checkout a project from a version control
 
 ## Create R markdowns from template (Reproducibility feature)
 - ```src/template_markdown.Rmd``` Creating markdowns from this template will give you several reproducibility friendly feature:
-* Automatic connection to your environment (renv)
-* Automatic report generation for your lab book
-* Automatic result organisation in date directories
+* 1. Automatic connection to your environment (renv)
+* 2. Automatic report generation for your lab book
+* 3. Automatic result organisation in date directories
 
-### Automatic connection to your environment (renv)
-Changes in your environment, e.g. by installing new packages, have to be capture by executing `renv::snapshot()`.
+### 1. Automatic connection to your environment (renv)
+Changes in your environment, e.g. by installing new packages, have to be capture by executing `renv::snapshot()` inside your R markdown.
 
-### Automatic report generation for your lab book
-When knitting your markdown, e.g. by clicking “knitr” button, the resulting html file will be saved under `results/labbook/` with the markdown-file-name and the date when you knitted it. These reports can be append to your actual lab book or easily used to show and discuss results with your colleagues.
+### 2. Automatic report generation for your lab book
+When knitting your markdown, e.g. by clicking “knitr” button, the resulting html file will be saved under ```results/labbook/``` with the markdown-file-name and the date when you knitted it. These reports can be append to your actual lab book or easily used to show and discuss results with your colleagues.
 To create really nice markdown reports, please see inside the template and check the [R Markdown cheat sheet](https://github.com/rstudio/cheatsheets/raw/master/rmarkdown-2.0.pdf)
 
-### Automatic result
-In order to save your results, e.g. plots and data, in an organised way, you can specify the the path to inside your markdown to `result.dir`. Doing so will save your results into the directory `results/date-of-analysis/`.
+### 3. Automatic result organisation in date directories
+In order to save your results, e.g. plots and data, in an organised way, you can specify the the path to inside your markdown to `result.dir . Doing so will save your results into the directory `results/date-of-analysis/`.
 Note: the working directory of your markdown is located in ```src/```. To direct results into the result directory you can use `paste0("../",result.dir,"YOURRESULTTOSAVE.pdf")`
 
 
