@@ -31,15 +31,21 @@ ifelse(isFALSE(dir.exists(paste0("../",result.dir))), dir.create(paste0("../",re
 options(stringsAsFactors = FALSE) 
 ```
 
-## Needed libraries
-```{r libraries, message=FALSE}
+
+# Heading 1
+
+## Heading 2
+
+Some text
+
+```{r message = FALSE}
+#Here you can put R code
 
 ```
 
-## Load data
-```{r message=FALSE, warning=FALSE}
+```{r, message = FALSE, Fig 1, fig.align='center', fig.cap='Figure 1: Caption', out.width=768, fig.pos='H'}
+#This block contains some useful options for inserting figures
 ```
-
 
 ## Take environment snapshot 
 ```{r}
