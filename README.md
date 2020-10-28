@@ -36,11 +36,11 @@ This repository provides a template for new computational projects. It contains 
 
 <a name="init_renv"></a>
 ## Initiating your R environment (Reproducibility feature)
-- ```src/project_init.R``` Run the script to initiate the R environment and connect it to the R Project. Consent with “yes” when asked.
-- Now, all of your used r packages and dependencies will now be recorded by executing ```renv::snapshot()```
+`src/project_init.R` Run the script to initiate the R environment and connect it to the R Project. Consent with **yes** when asked.
+  * Now, all of your used r packages and dependencies will now be recorded by executing ```renv::snapshot()```
 
 ## Create R markdowns from template (Reproducibility feature)
-- ```src/template_markdown.Rmd``` Creating markdowns from this template will give you several reproducibility friendly feature:
+`src/template_markdown.Rmd` Creating markdowns from this template will give you several reproducibility friendly feature:
   * Automatic connection to your environment (renv)
   * Automatic report generation for your lab book
   * Automatic result organisation in date directories
