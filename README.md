@@ -24,7 +24,7 @@ This study includes
 * Set it to private if you want (otherwise everyone can see your code)
 
 2. Go to your new GitHub repository and copy the url (green button “Code”)
-  2.1 You should have copied something like https://github.com/yourGitHubName/yourRepoName.git
+  2.1 You should have copied something like `**https://github.com/yourGitHubName/yourRepoName.git**`
  
 ### Connecting your GitHub Repository to your RStudio project
 3.	Open RStudio and create a new project from VersionControl (your GitHub repository) by following that path:
