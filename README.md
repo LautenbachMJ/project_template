@@ -5,6 +5,9 @@
 * [General info](#general-info)
 * [Repo description](#repo-description)
 * [Getting started](#getting-started)
+* [Initiating your R environment (Reproducibility feature)](#init_renv)
+* [Create R markdowns from template (Reproducibility feature)](#markdown)
+* [Thoughts and Comments](#thoughs_comments)
 
 ## General info
 This study includes
@@ -17,8 +20,9 @@ This study includes
 
 ### Creating a repository from a project template
 1.	Create a new GitHub repository based in [this template](https://github.com/LautenbachMJ/project_template)
-* 1a Enter a name for your new project repository (choose a clear/smart name and avoid special characters, e.g. covid19_study
-  1.2 Set it to private if you want (otherwise everyone can see your code)
+* Enter a name for your new project repository (choose a clear/smart name and avoid special characters, e.g. covid19_study
+* Set it to private if you want (otherwise everyone can see your code)
+
 2. Go to your new GitHub repository and copy the url (green button “Code”)
   2.1 You should have copied something like https://github.com/yourGitHubName/yourRepoName.git
  
@@ -30,29 +34,28 @@ File-> new project -> Version Control, Checkout a project from a version control
 5.	Change the path to the place where you want to save your project
 6.	Your project is is now connected to your GitHub account and can be used for version control.
 
-Note: From now on, everything described below will be executed in RStudio
+**Note: From now on, everything described below will be executed in RStudio**
 
-### Initiating your R environment (Reproducibility feature)
-1.	On the panel with files, go to src/ and open “project_init.R” and run the the code.
-2.	Consent with “yes” when asked
-3.	All of your used r packages and dependencies will now be recorded.
+## Initiating your R environment (Reproducibility feature)
+- ```src/project_init.R``` Run the script to initiate the R environment and connect it to the RProject. Consent with “yes” when asked.
+- Now, all of your used r packages and dependencies will now be recorded by executing ```renv::snapshot()```
 
-Creating a Rmarkdown from a template file to write your code (Reproducibility feature)
-4.	Open “template_markdown.Rmd” in the src/ directory and go to File-> Save as…
-5.	Save the markdown file with a name of your choice
-6.	Note: name it with a clear name of the purpose of your script
-7.	Within the markdown, adjust title, author (your name), project abstract or script purpose.
-8.	Now you can install all needed libraries and process/wrangle/analyse/visualize your data.
-9.	Note: save results to the result path, named “result.dir”. Your results will be saved in results/date-of-analysis/
+## Create R markdowns from template (Reproducibility feature)
+- ```src/template_markdown.Rmd``` Creating markdowns from this template will give you several reproducibility friendly feature:
+* Automatic connection to your environment (renv)
+* Automatic report generation for your lab book
+* Automatic result organisation in date directories
 
-Capturing a snapshot of all used packages and their dependencies (Reproducibility feature)
-1.	Execute the chunk “r renv_snap”
-2.	Give consent when asked
+### Automatic connection to your environment (renv)
+Changes in your environment, e.g. by installing new packages, have to be capture by executing ```renv::snapshot()```.
 
+### Automatic report generation for your lab book
+When knitting your markdown, e.g. by clicking “knitr” button, the resulting html file will be saved under ```results/labbook/``` with the markdown-file-name and the date when you knitted it. These reports can be append to your actual lab book or easily used to show and discuss results with your colleagues.
+To create really nice markdown reports, please see inside the template and check the [R Markdown cheat sheet](https://github.com/rstudio/cheatsheets/raw/master/rmarkdown-2.0.pdf)
 
-Knitting your Rmarkdown for your lab journal (Reproducibility feature)
-In the end of the day, run the entire markdown by clicking “knitr” button to save a html file that contains code, data structure and output to append to your ELIN lab book.
-You will find the knitted html file in results/labbook with the name of the Rmarkdown you run plus the date when you ran it.
+### Automatic result
+In order to save your results, e.g. plots and data, in an organised way, you can specify the the path to inside your markdown to “result.dir”. Doing so will save your results into the directory ```results/date-of-analysis/```.
+Note: the working directory of your markdown is located in ```src/```. To direct results into the result directory you can use ```paste0("../",result.dir,"YOURRESULTTOSAVE.pdf")```
 
 
 ```javascript
@@ -62,4 +65,4 @@ if (isAwesome){
 ```
 
 ## :thought_balloon: Thoughts and Comments
-Please create an Issue or write Julius an email or @LautenbachMJ.
+Please create an Issue or write Julius an email or a message to @LautenbachMJ.
