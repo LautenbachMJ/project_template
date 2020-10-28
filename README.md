@@ -10,7 +10,7 @@ This repository contains our idea project directory structure to make computatio
 * [Getting started](#getting-started)
 * [Initiating your R environment (Reproducibility feature)](#init_renv)
 * [Create R markdowns from template (Reproducibility feature)](#markdown)
-* [Thoughts and Comments](#thoughs_comments)
+* [Thoughts and Comments](#thoughs-comments)
 
 
 
@@ -34,6 +34,7 @@ This repository provides a template for new computational projects. It contains 
 
 **Note: From now on, everything described below will be executed in RStudio**
 
+<a name="init_renv"></a>
 ## Initiating your R environment (Reproducibility feature)
 - ```src/project_init.R``` Run the script to initiate the R environment and connect it to the R Project. Consent with “yes” when asked.
 - Now, all of your used r packages and dependencies will now be recorded by executing ```renv::snapshot()```
@@ -58,12 +59,6 @@ In order to save your results, e.g. plots and data, in an organised way, you can
   **Note:** The working directory of your markdown is located in ```src/```. To direct results into the result directory you can use:
     `paste0("../",result.dir,"your_result.pdf")`
 
-
-```javascript
-if (isAwesome){
-  return true
-}
-```
-
+<a name="thoughs-comments"></a>
 ## :thought_balloon: Thoughts and Comments
-Please create an Issue or write Julius an email or a message to @LautenbachMJ.
+If you have any thoughts and comments, let us know!
