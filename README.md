@@ -24,7 +24,7 @@ This study includes
 * Set it to private if you want (otherwise everyone can see your code)
 
 2. Go to your new GitHub repository and copy the url (green button “Code”)
-  2.1 You should have copied something like `**https://github.com/yourGitHubName/yourRepoName.git**`
+  2.1 You should have copied something like `https://github.com/yourGitHubName/yourRepoName.git`
  
 ### Connecting your GitHub Repository to your RStudio project
 3.	Open RStudio and create a new project from VersionControl (your GitHub repository) by following that path:
@@ -47,15 +47,15 @@ File-> new project -> Version Control, Checkout a project from a version control
 * Automatic result organisation in date directories
 
 ### Automatic connection to your environment (renv)
-Changes in your environment, e.g. by installing new packages, have to be capture by executing ```renv::snapshot()```.
+Changes in your environment, e.g. by installing new packages, have to be capture by executing `renv::snapshot()`.
 
 ### Automatic report generation for your lab book
-When knitting your markdown, e.g. by clicking “knitr” button, the resulting html file will be saved under ```results/labbook/``` with the markdown-file-name and the date when you knitted it. These reports can be append to your actual lab book or easily used to show and discuss results with your colleagues.
+When knitting your markdown, e.g. by clicking “knitr” button, the resulting html file will be saved under `results/labbook/` with the markdown-file-name and the date when you knitted it. These reports can be append to your actual lab book or easily used to show and discuss results with your colleagues.
 To create really nice markdown reports, please see inside the template and check the [R Markdown cheat sheet](https://github.com/rstudio/cheatsheets/raw/master/rmarkdown-2.0.pdf)
 
 ### Automatic result
-In order to save your results, e.g. plots and data, in an organised way, you can specify the the path to inside your markdown to “result.dir”. Doing so will save your results into the directory ```results/date-of-analysis/```.
-Note: the working directory of your markdown is located in ```src/```. To direct results into the result directory you can use ```paste0("../",result.dir,"YOURRESULTTOSAVE.pdf")```
+In order to save your results, e.g. plots and data, in an organised way, you can specify the the path to inside your markdown to `result.dir`. Doing so will save your results into the directory `results/date-of-analysis/`.
+Note: the working directory of your markdown is located in ```src/```. To direct results into the result directory you can use `paste0("../",result.dir,"YOURRESULTTOSAVE.pdf")`
 
 
 ```javascript
