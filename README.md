@@ -13,7 +13,6 @@ This repository contains our idea project directory structure to make computatio
 * [Thoughts and Comments](#thoughs-comments)
 
 
-
 ## Repo description
 This repository provides a template for new computational projects. It contains a pre-defined structure, as well as some features for reproducible research using an R project and version control via GitHub.
   * Pre-defined directory structure with readme files
@@ -27,10 +26,11 @@ This repository provides a template for new computational projects. It contains 
 1.	Create a new GitHub repository based in [this template](https://github.com/LautenbachMJ/project_template). You may want to set your repository to private if (otherwise everyone can see your code). You can make the repository available to colleagues by adding them as collaborators to the project.
 
 2. Go to your new repository and copy the url (green button “Code”)
-  2.1 You should have copied something like `https://github.com/yourGitHubName/yourRepoName.git`
+  * You should have copied something like `https://github.com/yourGitHubName/yourRepoName.git`
  
 ### Connecting your GitHub Repository to your RStudio project
-3.	Open RStudio and create a new project from VersionControl (your GitHub repository) by pasting in the copied URL. This will connect your GitHub repository to your R project and allows version control.
+3.	Open RStudio and create a new project (```File/New Project..```) from VersionControl (your GitHub repository) by pasting in the copied URL. This will connect your GitHub repository to your R project and allows version control.
+
 
 **Note: From now on, everything described below will be executed in RStudio**
 
