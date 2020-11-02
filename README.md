@@ -22,7 +22,7 @@ This repository provides a template for new computational projects. It contains 
 <a name="getting-started"></a>
 ## :technologist: Getting started
 
-### Creating a your own repository from this (project_template) repository template 
+### Creating a your own repository from this repository template 
 1.	Create a new GitHub repository based on [this template](https://github.com/LautenbachMJ/project_template). Click on the green button (“Use this template”). Give it a appropriate name. You may want to set your repository to private if (otherwise everyone can see your code). You can make the repository available to colleagues by adding them as collaborators to the project.
 
 2. Go to your new repository and copy the url (green button “Code”). You should have copied something like `https://github.com/yourGitHubName/yourRepoName.git`.
