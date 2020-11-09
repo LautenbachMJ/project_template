@@ -18,11 +18,7 @@ knit: (function(inputFile, encoding) {
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_knit$set(echo = TRUE,
-                     root.dir = getwd(),
-                     fig.width = 6, fig.height = 5,
-                     warning = FALSE, 
-                     message = FALSE)
+knitr::opts_knit$set(echo = TRUE, root.dir = getwd(), fig.width = 6, fig.height = 5, warning = FALSE, message = FALSE)
 
 result.dir <- paste0("results/",Sys.Date(),"/")
 
