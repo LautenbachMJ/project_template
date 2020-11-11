@@ -27,6 +27,7 @@ ifelse(isFALSE(dir.exists(paste0("../",result.dir))), dir.create(paste0("../",re
 options(stringsAsFactors = FALSE) 
 ```
 
+# R markdown usage 
 
 # Heading 1
 
@@ -36,21 +37,64 @@ Some text
 
 ```{r message = FALSE}
 #Here you can put R code
-
 ```
 
 ```{r, message = FALSE, Fig 1, fig.align='center', fig.cap='Figure 1: Caption', out.width=768, fig.pos='H'}
 #This block contains some useful options for inserting figures
 ```
 
-## Take environment snapshot 
-```{r}
-renv::snapshot()
+# Example r markdown script structure
+
+## 1. Needed libraries
+```{r message=FALSE}
+library(tidyverse)
+library(readxl)
+```
+
+## 2. Data import
+
+### 2.1 Import your data into R
+```{r message=FALSE}
+## to import excel files
+#read_xlsx("path/to/your_excel_file.xlsx") 
+
+## to import csv files
+#read_csv("path/to/your_csv_file.csv")
+
+```
+
+### 2.2 Data wrangling
+```{r message=FALSE}
+#- Prepare your data as for further use (formatting, normalization, etc.)
+#- Save your data in an external .txt tab or .csv files
+```
+
+### 2.3 Re-loading the data
+```{r message=FALSE}
+#- Import your data into R as follow `read.csv()`
+```
+
+## 3. Data analysis
+```{r message=FALSE}
+
+```
+
+## 4. Result visualisation
+```{r message=FALSE}
+
+```
+
+## 5. Discussion & Comments
+```{r message=FALSE}
+
 ```
 
 
-## SessionInfo
+## 6. SessionInfo
 ```{r}
+## Take environment snapshot 
+#renv::snapshot()
+
 sessionInfo()
 ```
 
