@@ -56,10 +56,11 @@ library(readxl)
 ### 2.1 Import your data into R
 ```{r message=FALSE}
 ## to import excel files
-#read_xlsx("path/to/your_excel_file.xlsx") 
+my_data <- read_xlsx("path/to/your_excel_file.xlsx") 
 
 ## to import csv files
-#read_csv("path/to/your_csv_file.csv")
+my_data <- read_csv("path/to/your_csv_file.csv")
+
 
 ```
 
