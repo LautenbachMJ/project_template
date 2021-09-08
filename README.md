@@ -43,7 +43,7 @@ This repository provides a template for new computational projects. It contains 
   * Automatic connection to your environment (renv)
   * Automatic report generation for your lab book
   * Automatic result organisation in date directories
-  [Here](https://markdown-it.github.io/) you can find some useful information on how to style your markdown.
+[Here](https://markdown-it.github.io/) you can find some useful information on how to style your markdown.
 
 ### 1. Automatic connection to your environment (renv)
 Changes in your environment, e.g. by installing new packages, have to be capture by executing `renv::snapshot()` inside your R markdown.
