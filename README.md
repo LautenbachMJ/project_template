@@ -43,7 +43,6 @@ This repository provides a template for new computational projects. It contains 
   * Automatic connection to your environment (renv)
   * Automatic report generation for your lab book
   * Automatic result organisation in date directories
-[Here](https://markdown-it.github.io/) you can find some useful information on how to style your markdown.
 
 ### 1. Automatic connection to your environment (renv)
 Changes in your environment, e.g. by installing new packages, have to be capture by executing `renv::snapshot()` inside your R markdown.
@@ -51,7 +50,8 @@ Changes in your environment, e.g. by installing new packages, have to be capture
 ### 2. Automatic report generation for your lab book
 When knitting your markdown, e.g. by clicking **knitr** button, the resulting html file will be saved under ```results/labbook/``` with the markdown-file-name and the date when you knitted it.
 These reports can be append to your actual lab book or easily used to show and discuss results with your colleagues.
-To create really nice markdown reports, please see inside the template and check the [R Markdown cheat sheet](https://github.com/rstudio/cheatsheets/raw/master/rmarkdown-2.0.pdf).
+To create really nice markdown reports, please see inside the template and check the [R Markdown cheat sheet](https://github.com/rstudio/cheatsheets/raw/master/rmarkdown-2.0.pdf) or interactively [here](https://markdown-it.github.io/).
+
 
 ### 3. Automatic result organisation in date directories
 In order to save your results, e.g. plots and data, in an organised way, you can specify the the path to inside your markdown to ```result.dir```. Doing so will save your results into the directory `results/date-of-analysis/`.
